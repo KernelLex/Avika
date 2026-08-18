@@ -14,14 +14,24 @@ private val AvikaLightColorScheme = lightColorScheme(
     secondary = AvikaAmber,
     onSecondary = AvikaSurface,
     secondaryContainer = AvikaAmberLight,
-    onSecondaryContainer = AvikaTealDark,
+    onSecondaryContainer = AvikaAmberDark,
+    tertiary = AvikaPlum,
+    onTertiary = AvikaSurface,
+    tertiaryContainer = AvikaPlumLight,
+    onTertiaryContainer = AvikaPlum,
     background = AvikaBackground,
     onBackground = AvikaOnSurface,
     surface = AvikaSurface,
     onSurface = AvikaOnSurface,
-    surfaceVariant = AvikaTealLight,
+    surfaceVariant = AvikaSurfaceContainer,
     onSurfaceVariant = AvikaOnSurfaceMuted,
+    surfaceContainerLowest = AvikaSurface,
+    surfaceContainerLow = AvikaSurfaceContainer,
+    surfaceContainer = AvikaSurfaceContainer,
+    surfaceContainerHigh = AvikaTealSoft,
+    surfaceContainerHighest = AvikaTealSoft,
     outline = AvikaOutline,
+    outlineVariant = AvikaOutline,
     error = AvikaError,
 )
 
@@ -32,10 +42,24 @@ private val AvikaDarkColorScheme = darkColorScheme(
     onPrimaryContainer = AvikaTealLight,
     secondary = AvikaAmber,
     onSecondary = AvikaTealDark,
-    background = androidx.compose.ui.graphics.Color(0xFF161C1B),
-    onBackground = androidx.compose.ui.graphics.Color(0xFFE4E2DD),
-    surface = androidx.compose.ui.graphics.Color(0xFF1E2423),
-    onSurface = androidx.compose.ui.graphics.Color(0xFFE4E2DD),
+    secondaryContainer = AvikaAmberDark,
+    onSecondaryContainer = AvikaAmberLight,
+    tertiary = AvikaPlumLight,
+    onTertiary = AvikaTealDark,
+    tertiaryContainer = AvikaPlum,
+    onTertiaryContainer = AvikaPlumLight,
+    background = AvikaDarkBackground,
+    onBackground = AvikaDarkOnSurface,
+    surface = AvikaDarkSurface,
+    onSurface = AvikaDarkOnSurface,
+    surfaceVariant = AvikaDarkSurfaceContainer,
+    onSurfaceVariant = AvikaDarkOnSurfaceMuted,
+    surfaceContainerLowest = AvikaDarkBackground,
+    surfaceContainerLow = AvikaDarkSurface,
+    surfaceContainer = AvikaDarkSurfaceContainer,
+    surfaceContainerHigh = AvikaDarkSurfaceContainer,
+    surfaceContainerHighest = AvikaDarkSurfaceContainer,
+    outline = AvikaDarkOnSurfaceMuted,
 )
 
 @Composable
@@ -47,6 +71,7 @@ fun AvikaTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = AvikaTypography,
+        shapes = AvikaShapes,
         content = content
     )
 }
