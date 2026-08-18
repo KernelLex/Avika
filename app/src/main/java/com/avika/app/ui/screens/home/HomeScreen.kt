@@ -1,35 +1,50 @@
 package com.avika.app.ui.screens.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.Park
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.avika.app.ui.components.AvikaTopBar
+import com.avika.app.ui.components.IconChip
+import com.avika.app.ui.theme.AvikaAmber
+import com.avika.app.ui.theme.AvikaAmberLight
+import com.avika.app.ui.theme.AvikaPlum
+import com.avika.app.ui.theme.AvikaPlumLight
+import com.avika.app.ui.theme.AvikaTeal
+import com.avika.app.ui.theme.AvikaTealDark
+import com.avika.app.ui.theme.AvikaTealLight
 
 private data class HomeAction(
     val title: String,
     val subtitle: String,
     val icon: ImageVector,
+    val chipColor: androidx.compose.ui.graphics.Color,
+    val chipContentColor: androidx.compose.ui.graphics.Color,
     val onClick: () -> Unit,
 )
 
@@ -38,53 +53,94 @@ fun HomeScreen(
     onOpenDirectory: () -> Unit,
     onOpenVenues: () -> Unit,
     onOpenSchemes: () -> Unit,
+    onOpenProfile: () -> Unit,
 ) {
     val actions = listOf(
         HomeAction(
             "Find a clinic",
             "Occupational, speech & ABA therapy, developmental pediatrics",
             Icons.Filled.LocalHospital,
+            AvikaTealLight, AvikaTealDark,
             onOpenDirectory,
         ),
         HomeAction(
             "Sensory-friendly venues",
             "Parks and public spaces with accessible, inclusive design",
             Icons.Filled.Park,
+            AvikaAmberLight, AvikaAmber,
             onOpenVenues,
         ),
         HomeAction(
             "Schemes & UDID guide",
             "UDID, Swavlamban, Niramaya, railway concessions, pensions",
             Icons.AutoMirrored.Filled.MenuBook,
+            AvikaPlumLight, AvikaPlum,
             onOpenSchemes,
         ),
     )
 
-    Scaffold(topBar = { AvikaTopBar(title = "Avika") }) { padding ->
+    Scaffold { padding ->
         LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = 16.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(padding),
         ) {
+            item { HomeHero(onOpenProfile = onOpenProfile) }
             item {
-                Text(
-                    "A starting point for Bengaluru families",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 4.dp),
-                )
-                Text(
-                    "Find therapy clinics, accessible places to spend time, and the government support your family is entitled to — all in one place.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 8.dp),
-                )
-            }
-            items(actions) { action ->
-                HomeActionCard(action)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp).padding(top = 20.dp),
+                ) {
+                    actions.forEach { HomeActionCard(it) }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun HomeHero(onOpenProfile: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(listOf(AvikaTealDark, AvikaTeal)),
+                RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
+            )
+            .statusBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 28.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                "Avika",
+                style = MaterialTheme.typography.titleMedium,
+                color = AvikaTealLight,
+            )
+            IconButton(
+                onClick = onOpenProfile,
+                modifier = Modifier
+                    .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f), CircleShape),
+            ) {
+                Icon(Icons.Filled.Person, contentDescription = "Family account", tint = androidx.compose.ui.graphics.Color.White)
+            }
+        }
+        Text(
+            "A starting point for Bengaluru families",
+            style = MaterialTheme.typography.displaySmall,
+            color = androidx.compose.ui.graphics.Color.White,
+            modifier = Modifier.padding(top = 8.dp, end = 24.dp),
+        )
+        Text(
+            "Find therapy clinics, accessible places to spend time, and the government support your family is entitled to — all in one place.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = AvikaTealLight,
+            modifier = Modifier.padding(top = 10.dp),
+        )
     }
 }
 
@@ -92,32 +148,34 @@ fun HomeScreen(
 private fun HomeActionCard(action: HomeAction) {
     Card(
         onClick = action.onClick,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                action.icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            IconChip(
+                icon = action.icon,
+                containerColor = action.chipColor,
+                contentColor = action.chipContentColor,
                 modifier = Modifier.padding(end = 16.dp),
             )
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    action.title,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
+                Text(action.title, style = MaterialTheme.typography.titleMedium)
                 Text(
                     action.subtitle,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 2.dp),
                 )
             }
-            Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
+            Icon(
+                Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

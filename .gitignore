@@ -13,3 +13,7 @@ local.properties
 *.apk
 *.aab
 google-services.json
+*.jks
+*.keystore
+keystore.properties
+/dist

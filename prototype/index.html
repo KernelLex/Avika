@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Avika — Prototype</title>
+<style>
+  :root {
+    --teal: #14746E;
+    --teal-dark: #0B3D3A;
+    --teal-light: #C3E9E4;
+    --teal-soft: #EAF4F2;
+    --amber: #F0793D;
+    --amber-dark: #C4551E;
+    --amber-light: #FCE1CC;
+    --plum: #7C5CBF;
+    --plum-light: #E7DFF6;
+    --bg: #FAF7F2;
+    --surface: #FFFFFF;
+    --surface-container: #F3EEE6;
+    --on-surface: #201C1A;
+    --on-surface-muted: #625C54;
+    --outline: #E4DDD1;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #E9E4DC;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--on-surface);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .page-note {
+    position: fixed;
+    top: 14px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; color: #6b675f;
+    text-align: center;
+    max-width: 520px;
+  }
+  .phone {
+    margin-top: 56px;
+    width: 390px;
+    height: 800px;
+    background: var(--bg);
+    border-radius: 40px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    border: 10px solid #111;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .statusbar {
+    height: 28px;
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+  .screen {
+    flex: 1;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+  }
+  .screen.active { display: flex; }
+
+  .topbar {
+    padding: 14px 16px 12px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .topbar h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+  }
+  .hero {
+    flex-shrink: 0;
+    background: linear-gradient(180deg, var(--teal-dark), var(--teal));
+    border-radius: 0 0 32px 32px;
+    padding: 34px 20px 28px;
+    color: #fff;
+  }
+  .hero .brand { font-size: 14px; font-weight: 600; color: var(--teal-light); letter-spacing: 0.2px; }
+  .hero h2 { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin: 8px 40px 10px 0; }
+  .hero p { font-size: 15px; line-height: 1.45; color: var(--teal-light); margin: 0; }
+  .backbtn {
+    width: 32px; height: 32px;
+    border: none; background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--on-surface);
+  }
+  .backbtn.spacer { visibility: hidden; }
+
+  .content {
+    padding: 4px 16px 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  p.lede {
+    color: var(--on-surface-muted);
+    font-size: 15px;
+    line-height: 1.4;
+    margin: 0 0 16px;
+  }
+  .disclaimer {
+    font-size: 13px;
+    color: var(--on-surface-muted);
+    line-height: 1.4;
+    margin: 4px 0 14px;
+  }
+
+  .action-card {
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(20,30,29,0.08), 0 1px 2px rgba(20,30,29,0.06);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: left;
+  }
+  .icon-chip {
+    width: 48px; height: 48px; flex-shrink: 0;
+    border-radius: 15px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-chip svg { width: 24px; height: 24px; }
+  .action-card .titles { flex: 1; }
+  .action-card .titles .t { font-size: 16px; font-weight: 700; color: var(--on-surface); }
+  .action-card .titles .s { font-size: 13px; color: var(--on-surface-muted); margin-top: 2px; line-height: 1.35;}
+  .action-card .chev { color: var(--on-surface-muted); flex-shrink: 0; }
+
+  .chiprow {
+    display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px;
+  }
+  .chip {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--outline);
+    background: var(--surface);
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--on-surface);
+    white-space: nowrap;
+  }
+  .chip.selected {
+    background: var(--teal-light);
+    border-color: var(--teal);
+    color: var(--teal-dark);
+    font-weight: 600;
+  }
+
+  .card {
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(20,30,29,0.07), 0 1px 2px rgba(20,30,29,0.05);
+    border-radius: 20px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card .body { flex: 1; }
+  .card .name { font-size: 16px; font-weight: 700; }
+  .card .area { font-size: 13px; color: var(--on-surface-muted); display: flex; align-items: center; gap: 4px; margin-top: 2px;}
+  .card .specialties { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .mini-chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--surface-container);
+    color: var(--on-surface-muted);
+  }
+  .card .cat { font-size: 13px; color: var(--on-surface-muted); margin-top: 2px; }
+  .card .chev { color: var(--on-surface-muted); flex-shrink: 0; }
+
+  .detail-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .detail-card {
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(20,30,29,0.07), 0 1px 2px rgba(20,30,29,0.05);
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .detail-card .label { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .detail-card .value { font-size: 15px; line-height: 1.4; margin-bottom: 14px; }
+  .btnrow { display: flex; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px;
+    border-radius: 14px;
+    font-size: 14px; font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+  }
+  .btn.primary { background: var(--teal); color: #fff; }
+  .btn.outline { background: var(--teal-soft); color: var(--teal-dark); border: none; }
+  .note {
+    font-size: 13px; color: var(--on-surface-muted); line-height: 1.4;
+    padding-top: 10px; margin-top: 4px; border-top: 1px solid var(--outline);
+  }
+  .desc { font-size: 15px; line-height: 1.5; margin-bottom: 14px; }
+
+  .scheme-card {
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(20,30,29,0.07), 0 1px 2px rgba(20,30,29,0.05);
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+  .scheme-card .title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+  .scheme-card .summary { font-size: 13px; color: var(--on-surface-muted); margin-bottom: 10px; line-height: 1.4; }
+  .scheme-card ul { margin: 0; padding-left: 18px; }
+  .scheme-card li { font-size: 14.5px; line-height: 1.5; margin-bottom: 6px; }
+  .link-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--outline);
+    color: var(--teal); font-size: 14px; font-weight: 600;
+    text-decoration: none; width: 100%;
+  }
+
+  .about-section { margin-bottom: 18px; }
+  .about-section h3 { font-size: 16px; margin: 0 0 6px; }
+  .about-section p { font-size: 14.5px; line-height: 1.55; color: var(--on-surface-muted); margin: 0; }
+
+  .bottomnav-wrap {
+    flex-shrink: 0;
+    padding: 4px 14px calc(env(safe-area-inset-bottom, 0px) + 14px);
+  }
+  .bottomnav {
+    display: flex;
+    background: var(--surface);
+    border-radius: 28px;
+    box-shadow: 0 10px 30px rgba(20,30,29,0.18);
+    padding: 8px 4px;
+  }
+  .navitem {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: none; border: none; cursor: pointer;
+    color: var(--on-surface-muted);
+    padding: 7px 4px;
+    margin: 0 2px;
+    border-radius: 16px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .navitem.selected { background: var(--teal-soft); color: var(--teal-dark); }
+  .navitem svg { width: 21px; height: 21px; }
+  .navitem span { font-size: 11px; font-weight: 500; }
+  .navitem.selected { color: var(--teal); }
+  .navitem.selected svg { color: var(--teal); }
+</style>
+</head>
+<body>
+
+<div class="page-note">Visual prototype of the Avika V0 Compose app — the real app on your phone is the built APK, this mirrors the same screens/content for quick browsing.</div>
+
+<div class="phone">
+  <div class="statusbar"></div>
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="hero">
+      <div class="brand">Avika</div>
+      <h2>A starting point for Bengaluru families</h2>
+      <p>Find therapy clinics, accessible places to spend time, and the government support your family is entitled to — all in one place.</p>
+    </div>
+    <div class="content" style="padding-top:20px;">
+      <button class="action-card" onclick="go('directory')">
+        <div class="icon-chip" style="background:var(--teal-light);color:var(--teal-dark);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/><path d="M2 21h20"/><path d="M12 7v4"/><path d="M10 9h4"/><path d="M9 21v-4a3 3 0 0 1 6 0v4"/></svg></div>
+        <div class="titles"><div class="t">Find a clinic</div><div class="s">Occupational, speech &amp; ABA therapy, developmental pediatrics</div></div>
+        <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <button class="action-card" onclick="go('venues')">
+        <div class="icon-chip" style="background:var(--amber-light);color:var(--amber-dark);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 7 9h3l-4 6h4l-3 6h10l-3-6h4l-4-6h3z"/><path d="M12 21v-6"/></svg></div>
+        <div class="titles"><div class="t">Sensory-friendly venues</div><div class="s">Parks and public spaces with accessible, inclusive design</div></div>
+        <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <button class="action-card" onclick="go('schemes')">
+        <div class="icon-chip" style="background:var(--plum-light);color:var(--plum);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+        <div class="titles"><div class="t">Schemes &amp; UDID guide</div><div class="s">UDID, Swavlamban, Niramaya, railway concessions, pensions</div></div>
+        <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="bottomnav-wrap"><div class="bottomnav" id="bottomnav-home"></div></div>
+  </div>
+
+  <!-- DIRECTORY LIST -->
+  <div class="screen" id="screen-directory">
+    <div class="topbar"><button class="backbtn spacer"></button><h1>Clinic Directory</h1><button class="backbtn spacer"></button></div>
+    <div class="content">
+      <p class="disclaimer">Compiled from public listings, Aug 2026 — please call ahead to confirm details.</p>
+      <div class="chiprow" id="specialty-chips"></div>
+      <div id="clinic-list"></div>
+    </div>
+    <div class="bottomnav-wrap"><div class="bottomnav" id="bottomnav-directory"></div></div>
+  </div>
+
+  <!-- DIRECTORY DETAIL -->
+  <div class="screen" id="screen-clinic-detail">
+    <div class="topbar"><button class="backbtn" onclick="go('directory')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="clinic-detail-title"></h1><button class="backbtn spacer"></button></div>
+    <div class="content" id="clinic-detail-body"></div>
+  </div>
+
+  <!-- VENUES LIST -->
+  <div class="screen" id="screen-venues">
+    <div class="topbar"><button class="backbtn spacer"></button><h1>Sensory-Friendly Venues</h1><button class="backbtn spacer"></button></div>
+    <div class="content">
+      <p class="disclaimer">Public places in Bengaluru with documented accessible or sensory-friendly features. A short, honest list — we'd rather grow it slowly with verified spots than guess.</p>
+      <div id="venue-list"></div>
+    </div>
+    <div class="bottomnav-wrap"><div class="bottomnav" id="bottomnav-venues"></div></div>
+  </div>
+
+  <!-- VENUE DETAIL -->
+  <div class="screen" id="screen-venue-detail">
+    <div class="topbar"><button class="backbtn" onclick="go('venues')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="venue-detail-title"></h1><button class="backbtn spacer"></button></div>
+    <div class="content" id="venue-detail-body"></div>
+  </div>
+
+  <!-- SCHEMES -->
+  <div class="screen" id="screen-schemes">
+    <div class="topbar"><button class="backbtn spacer"></button><h1>Schemes &amp; UDID Guide</h1><button class="backbtn spacer"></button></div>
+    <div class="content">
+      <p class="disclaimer">General orientation only, not legal or medical advice — always confirm details on the official portal linked in each section.</p>
+      <div id="scheme-list"></div>
+    </div>
+    <div class="bottomnav-wrap"><div class="bottomnav" id="bottomnav-schemes"></div></div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="screen" id="screen-about">
+    <div class="topbar"><button class="backbtn spacer"></button><h1>About Avika</h1><button class="backbtn spacer"></button></div>
+    <div class="content">
+      <div class="about-section"><h3>Why Avika exists</h3><p>Bengaluru parents of children with disabilities spend hours piecing together which clinics actually help, which public spaces are workable for their child, and which government schemes they qualify for. That information exists, but it's scattered across word-of-mouth, old forum posts, and offices that are hard to reach. Avika puts it in one place.</p></div>
+      <div class="about-section"><h3>What's in this version</h3><p>A directory of therapy clinics and developmental pediatricians, a list of public venues in Bengaluru with documented accessible or sensory-friendly features, and a plain-language guide to UDID, Swavlamban, Niramaya, railway concessions, and disability pensions.</p></div>
+      <div class="about-section"><h3>A note on accuracy</h3><p>Clinic and venue listings are compiled from public sources and have not all been field-verified. Scheme details link to official government portals, which are the source of truth — this app is an orientation guide, not a replacement for them. We're actively working to verify every listing directly with families and providers.</p></div>
+      <div class="about-section"><h3>What's next</h3><p>Parent reviews, search and filtering, and easier sharing are coming in the next few weeks, along with an ongoing effort to grow and verify the directory with local NGOs and parent communities.</p></div>
+    </div>
+    <div class="bottomnav-wrap"><div class="bottomnav" id="bottomnav-about"></div></div>
+  </div>
+
+</div>
+
+<script>
+const ICONS = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>',
+  clinics: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+  venues: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 7 9h3l-4 6h4l-3 6h10l-3-6h4l-4-6h3z"/><path d="M12 21v-6"/></svg>',
+  schemes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+  about: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>',
+  call: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  map: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><path d="M9 3v15M15 6v15"/></svg>',
+  link: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>',
+  chev: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>',
+  pin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>'
+};
+
+const NAV = [
+  {id:'home', label:'Home', icon:'home'},
+  {id:'directory', label:'Clinics', icon:'clinics'},
+  {id:'venues', label:'Venues', icon:'venues'},
+  {id:'schemes', label:'Schemes', icon:'schemes'},
+  {id:'about', label:'About', icon:'about'},
+];
+['home','directory','venues','schemes','about'].forEach(topId => {
+  const el = document.getElementById('bottomnav-'+topId);
+  el.innerHTML = NAV.map(n => `<button class="navitem ${n.id===topId?'selected':''}" onclick="go('${n.id}')">${ICONS[n.icon]}<span>${n.label}</span></button>`).join('');
+});
+
+const SPECIALTIES = ['Occupational Therapy','Speech Therapy','ABA / Autism Therapy','Developmental Pediatrics'];
+
+const CLINICS = [
+  {id:'pinnacle-jayanagar', name:'Pinnacle Blooms Network – Jayanagar', specialties:['Speech Therapy','Occupational Therapy','ABA / Autism Therapy'], area:'Jayanagar', address:'12th Main, 27th Cross, 4th Block East, Jayanagar, Bengaluru 560011', phone:'+919100181181'},
+  {id:'pinnacle-indiranagar', name:'Pinnacle Blooms Network – Indiranagar', specialties:['Speech Therapy','Occupational Therapy','ABA / Autism Therapy'], area:'Indiranagar', address:'Indiranagar, Bengaluru', phone:'+919100181181', notes:'Exact street address not published online — confirm unit/floor by phone.'},
+  {id:'eav-sahakarnagar', name:'Early Autism Ventures – Sahakara Nagar', specialties:['ABA / Autism Therapy','Occupational Therapy'], area:'Sahakara Nagar', address:'2153, D Block, 16th Cross, 8th Main, Sahakara Nagar, Bengaluru', phone:'+918929153820'},
+  {id:'eav-jpnagar', name:'Early Autism Ventures – J P Nagar', specialties:['ABA / Autism Therapy','Occupational Therapy'], area:'J P Nagar', address:'No. 681, 6th C Main Road, 14th Cross, J P Nagar 3rd Phase, Bengaluru', phone:'+918929153820'},
+  {id:'eav-hsr', name:'Early Autism Ventures – HSR Layout', specialties:['ABA / Autism Therapy','Occupational Therapy','Speech Therapy'], area:'HSR Layout', address:'Venkatadri, 9 & 10, 4th Cross Rd, ITI Layout, Hosapalya, Muneshwara Nagar, Bengaluru 560068', phone:'+918929153820'},
+  {id:'eav-kalyannagar', name:'Early Autism Ventures – Kalyan Nagar', specialties:['ABA / Autism Therapy','Occupational Therapy'], area:'Kalyan Nagar', address:'931, 5th Cross, 9th Main Rd, HRBR Layout 1st Block, Kalyan Nagar, Bengaluru 560043', phone:'+918929153820'},
+  {id:'steppingstones-marathahalli', name:'Stepping Stones Center', specialties:['ABA / Autism Therapy','Speech Therapy','Occupational Therapy'], area:'Marathahalli', address:'76, Karthik Nagar, Marathahalli, Bengaluru 560037', phone:'+917022626487', notes:'Phone listed is a WhatsApp contact number.'},
+  {id:'sambhavam-whitefield', name:'Sambhavam Center for Autism', specialties:['ABA / Autism Therapy'], area:'Whitefield', address:'Orange International Preschool & Day Care, 563, 60 Feet Road, AECS Layout C Block, Brookfield, Bengaluru', phone:'+917760764217', notes:'Phone listed is a WhatsApp contact number.'},
+  {id:'pragyan-basavangudi', name:'Pragyan Child Development Centre – Basavangudi', specialties:['Speech Therapy','Occupational Therapy','ABA / Autism Therapy'], area:'Basavangudi', address:'Kapini Ganga Building, #39/2, 4th Floor, Sannidhi Road, next to NR Colony Bus Stop, Bengaluru 560004', phone:'+917016635914'},
+  {id:'pragyan-rajajinagar', name:'Pragyan Child Development Centre – Rajajinagar', specialties:['Speech Therapy','Occupational Therapy','ABA / Autism Therapy'], area:'Rajajinagar', address:'No. 415, 20th Main Road, 1st Block, West of Chord Road, Nagapura, Bengaluru 560010', phone:'+917016635914'},
+  {id:'pragyan-rtnagar', name:'Pragyan Child Development Centre – RT Nagar', specialties:['Speech Therapy','Occupational Therapy','ABA / Autism Therapy'], area:'RT Nagar', address:'No. 3, 1st Floor, 10th Cross, CBI Road, Ganganagar, Bengaluru 560032', phone:'+917016635914'},
+  {id:'pragyan-varthur', name:'Pragyan Child Development Centre – Varthur', specialties:['Speech Therapy','Occupational Therapy','ABA / Autism Therapy'], area:'Varthur', address:'3rd Floor, Khata No. 1561, Balagere Road, Devasthanagalu, Bengaluru 560087', phone:'+917016635914'},
+  {id:'ssot-uttarahalli', name:'SS Occupational Therapy – Centre for Child Development', specialties:['Occupational Therapy'], area:'Uttarahalli', address:'Uttarahalli, Bengaluru', phone:'+918760626262', notes:'Exact street address not published online — confirm by phone.'},
+  {id:'ssot-rrnagar', name:'SS Occupational Therapy – Centre for Child Development', specialties:['Occupational Therapy'], area:'Rajarajeshwari Nagar', address:'Rajarajeshwari Nagar, Bengaluru', phone:'+918760626262', notes:'Exact street address not published online — confirm by phone.'},
+  {id:'manipal-autism-clinic', name:'Manipal Hospital – Autism Clinic', specialties:['Developmental Pediatrics','Occupational Therapy','Speech Therapy','ABA / Autism Therapy'], area:'Old Airport Road', address:'Manipal Hospital, 98 HAL Old Airport Road, Kodihalli, Bengaluru 560017', phone:'+918025023225', notes:'Autism Clinic hours: 3–6 PM, Monday–Saturday.'},
+  {id:'kindersurge-koramangala', name:'KinderSurge', specialties:['Developmental Pediatrics'], area:'Koramangala', address:'522, 3rd Cross Rd, KHB Block, Koramangala, Bengaluru', phone:'+919880271583'},
+  {id:'rainbow-marathahalli', name:"Rainbow Children's Hospital – Marathahalli", specialties:['Developmental Pediatrics'], area:'Marathahalli', address:'Marathahalli, Bengaluru', phone:'18002122', notes:'Developmental pediatrics consult (Dr. Rachana G) — confirm exact address/timing by phone.'},
+];
+
+const VENUES = [
+  {id:'coles-park', name:'Coles Park', category:'Public Park', area:'Frazer Town', address:'Coles Road, Frazer Town, Bengaluru', tags:['Wheelchair access','Sensory / inclusive play equipment'], description:"Bengaluru's first inclusive play space, built with BBMP and Kilikili in 2006 — ramps, accessible pathways, and wheelchair-friendly sand tables and swings.", sourceNote:'Public NGO/news coverage, Aug 2026 — confirm current condition before visiting.'},
+  {id:'gayatri-devi-park', name:'Gayatri Devi Park', category:'Public Park', area:'Rajajinagar', address:'Gayatri Devi Park Road, Rajajinagar, Bengaluru', tags:['Wheelchair access','Sensory / inclusive play equipment'], description:'Opened 2009 with wheelchair-accessible play structures, a sensory integration track, and accessible basketball poles.', sourceNote:'Public NGO/news coverage, Aug 2026 — confirm current condition before visiting.'},
+  {id:'mnkrishnarao-park', name:'M. N. Krishna Rao Park', category:'Public Park', area:'Basavangudi', address:'Bull Temple Road, Basavangudi, Bengaluru', tags:['Wheelchair access','Sensory / inclusive play equipment'], description:'Inaugurated 2010 with multi-sensory equipment — sound rods, textured tiles, wheelchair merry-go-rounds, and a wheel-through arcade.', sourceNote:'Public NGO/news coverage, Aug 2026 — confirm current condition before visiting.'},
+  {id:'special-kids-park-cubbon', name:'Special Kids Park, Jawahar Bal Bhavan', category:'Public Park', area:'Cubbon Park', address:'Jawahar Bal Bhavan, Cubbon Park, Bengaluru', tags:['Wheelchair access','Sensory / inclusive play equipment'], description:'A play area inside Cubbon Park designed for children with physical disabilities, with wheelchair-friendly swings and sand tubs.', sourceNote:'Public news coverage, Aug 2026 — confirm current condition before visiting.'},
+  {id:'lalbagh', name:'Lalbagh Botanical Garden', category:'Park / Garden', area:'Mavalli', address:'Lalbagh Main Gate Road, Mavalli, Bengaluru 560004', tags:['Wheelchair access','Accessible restroom'], description:'Large, spacious botanical garden with a dedicated disability-accessible washroom installed with RampMyCity, and wide paved paths that suit wheelchairs and prams.', sourceNote:'Public news coverage, Aug 2026 — confirm current condition before visiting.'},
+  {id:'blr-airport-sensory-room', name:'Kempegowda International Airport – Sensory Room', category:'Travel / Airport', area:'Devanahalli', address:'Terminal 2, Level 4, near the 080 International Lounge, Kempegowda International Airport, Bengaluru', tags:['Dedicated quiet space'], description:"India's first airport sensory room for neurodivergent travellers — soft lighting, calming sounds, weighted blankets and a low-stimulation retreat before or after a flight.", sourceNote:'Airport/press coverage, Aug 2026.'},
+];
+
+const SCHEMES = [
+  {title:'UDID: Getting a Disability Certificate & ID Card', summary:'The Unique Disability ID (UDID) is the single national ID that unlocks almost every other benefit on this page — usually the first thing to apply for.', details:[
+    'Issued by the Department of Empowerment of Persons with Disabilities (DEPwD), Government of India, for all 21 disabilities recognised under the Rights of Persons with Disabilities Act, 2016.',
+    'Apply online with Aadhaar e-KYC, or at a government hospital / district disability rehabilitation centre that does UDID assessments — a medical board examines the child and certifies the disability percentage.',
+    'Typical processing time is about 7–14 working days once the medical assessment is done, though it can take longer depending on the hospital\'s board schedule.',
+    "In Bengaluru, assessments are usually done at government hospitals with a certifying Medical Board — check the official portal's facility locator for the nearest and current one.",
+    'Keep the UDID number handy — Niramaya, railway concession cards, and most Karnataka welfare schemes ask for it.'
+  ], link:'https://www.swavlambancard.gov.in/'},
+  {title:"Swavlamban (Karnataka's Disability ID Card)", summary:"Karnataka's own name and delivery process for the disability ID card, run on top of the same central UDID system.", details:[
+    'Administered in Karnataka by the Department for the Empowerment of Differently Abled and Senior Citizens.',
+    "In practice this is Karnataka's implementation of the national UDID rollout, not a separate card you apply for twice — but state-level help and camps are organised under the Swavlamban name.",
+    'Karnataka has issued the card to lakhs of persons with disabilities across the state; local taluk/district offices can help if the online process gets stuck.'
+  ], link:'https://dwdsc.karnataka.gov.in/english'},
+  {title:'Niramaya Health Insurance', summary:'A National Trust health insurance scheme built specifically for autism, cerebral palsy, intellectual disability, and multiple disabilities — covers therapies, not just hospitalisation.', details:[
+    'Run by the National Trust (Ministry of Social Justice & Empowerment) for persons with Autism, Cerebral Palsy, Intellectual Disability, and Multiple Disabilities.',
+    'Annual coverage up to ₹1,00,000 on a reimbursement basis, covering hospitalisation, corrective surgery, OPD consultations, diagnostics, medicines, and therapies including speech, occupational, and physiotherapy.',
+    'A UDID number is mandatory for enrolment or renewal — get that first.',
+    "Enrolment/renewal windows open on the National Trust portal each policy year — check current dates before assuming it's open."
+  ], link:'https://nationaltrust.nic.in/niramaya/'},
+  {title:'Railway Concessions', summary:'Discounted train fares for the child and one accompanying escort, now linked directly to the UDID card.', details:[
+    'Concessions range roughly 25–75% depending on travel class and disability category — orthopaedic/paraplegic passengers and their escort get 75% off Second, Sleeper, First and AC 3-tier fares; visually impaired passengers and their escort get 50% off.',
+    'An accompanying escort typically gets the same percentage concession as the passenger.',
+    'Since the UDID integration, concession cards can be applied for online through the Indian Railways portal or at a Jan Suvidha Kendra.',
+    'Minimum disability thresholds apply (commonly 40%) — check the current eligibility table on the official portal for the exact category.'
+  ], link:'https://www.indianrail.gov.in/enquiry/StaticPages/StaticEnquiry.jsp?StaticPage=conc_Rules.html'},
+  {title:'Disability Pensions (Karnataka)', summary:'Monthly financial support schemes for persons with disabilities run by the Karnataka state government.', details:[
+    'Karnataka runs monthly disability pension schemes through the Department for the Empowerment of Differently Abled and Senior Citizens, alongside central schemes for severe/multiple disabilities.',
+    "Eligibility, pension amount, and required documents (UDID, income certificate, residence proof) are set by the state and revised from time to time — this app deliberately doesn't quote a rupee amount since it changes.",
+    'Local disability welfare/NGO offices can usually help fill the application if the online process is confusing.'
+  ], link:'https://dwdsc.karnataka.gov.in/english'},
+];
+
+let selectedSpecialty = null;
+
+function renderChips() {
+  const el = document.getElementById('specialty-chips');
+  const chips = ['All', ...SPECIALTIES];
+  el.innerHTML = chips.map(s => {
+    const isAll = s === 'All';
+    const sel = isAll ? selectedSpecialty === null : selectedSpecialty === s;
+    return `<button class="chip ${sel?'selected':''}" onclick="selectSpecialty(${isAll ? 'null' : `'${s}'`})">${s}</button>`;
+  }).join('');
+}
+function selectSpecialty(s) {
+  selectedSpecialty = s;
+  renderChips();
+  renderClinics();
+}
+function renderClinics() {
+  const list = selectedSpecialty ? CLINICS.filter(c => c.specialties.includes(selectedSpecialty)) : CLINICS;
+  document.getElementById('clinic-list').innerHTML = list.map(c => `
+    <div class="card" onclick="openClinic('${c.id}')">
+      <div class="body">
+        <div class="name">${c.name}</div>
+        <div class="area">${ICONS.pin} ${c.area}</div>
+        <div class="specialties">${c.specialties.slice(0,2).map(s => `<span class="mini-chip">${s}</span>`).join('')}</div>
+      </div>
+      <div class="chev">${ICONS.chev}</div>
+    </div>`).join('');
+}
+function openClinic(id) {
+  const c = CLINICS.find(x => x.id === id);
+  document.getElementById('clinic-detail-title').textContent = c.name;
+  document.getElementById('clinic-detail-body').innerHTML = `
+    <div class="detail-chips">${c.specialties.map(s => `<span class="mini-chip">${s}</span>`).join('')}</div>
+    <div class="detail-card">
+      <div class="label">Address</div>
+      <div class="value">${c.address}</div>
+      <div class="btnrow">
+        <a class="btn primary" href="tel:${c.phone}">${ICONS.call} Call</a>
+        <a class="btn outline" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name+', '+c.address)}">${ICONS.map} Maps</a>
+      </div>
+    </div>
+    ${c.notes ? `<div class="note">${c.notes}</div>` : ''}
+    <div class="note">Info compiled from public listings, Aug 2026 — not independently verified. Please call ahead to confirm before visiting.</div>
+  `;
+  go('clinic-detail');
+}
+
+function renderVenues() {
+  document.getElementById('venue-list').innerHTML = VENUES.map(v => `
+    <div class="card" onclick="openVenue('${v.id}')">
+      <div class="body">
+        <div class="name">${v.name}</div>
+        <div class="cat">${v.category} · ${v.area}</div>
+      </div>
+      <div class="chev">${ICONS.chev}</div>
+    </div>`).join('');
+}
+function openVenue(id) {
+  const v = VENUES.find(x => x.id === id);
+  document.getElementById('venue-detail-title').textContent = v.name;
+  document.getElementById('venue-detail-body').innerHTML = `
+    <div class="detail-chips">${v.tags.map(t => `<span class="mini-chip">${t}</span>`).join('')}</div>
+    <div class="desc">${v.description}</div>
+    <div class="detail-card">
+      <div class="label">Address</div>
+      <div class="value">${v.address}</div>
+      <a class="btn outline" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name+', '+v.address)}">${ICONS.map} Maps</a>
+    </div>
+    <div class="note">${v.sourceNote}</div>
+  `;
+  go('venue-detail');
+}
+
+function renderSchemes() {
+  document.getElementById('scheme-list').innerHTML = SCHEMES.map(s => `
+    <div class="scheme-card">
+      <div class="title">${s.title}</div>
+      <div class="summary">${s.summary}</div>
+      <ul>${s.details.map(d => `<li>${d}</li>`).join('')}</ul>
+      <a class="link-btn" target="_blank" rel="noopener" href="${s.link}">${ICONS.link} Official portal</a>
+    </div>`).join('');
+}
+
+function go(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+screenId).classList.add('active');
+}
+
+renderChips();
+renderClinics();
+renderVenues();
+renderSchemes();
+
+// Live-reload: poll this page's Last-Modified header and reload when it changes,
+// so edits made while this tab is open show up automatically.
+(function liveReload() {
+  let lastKnown = null;
+  setInterval(async () => {
+    try {
+      const res = await fetch(location.pathname, { method: 'HEAD', cache: 'no-store' });
+      const modified = res.headers.get('Last-Modified');
+      if (modified) {
+        if (lastKnown === null) lastKnown = modified;
+        else if (modified !== lastKnown) location.reload();
+      }
+    } catch (e) { /* server restarting, ignore and retry */ }
+  }, 1000);
+})();
+</script>
+</body>
+</html>

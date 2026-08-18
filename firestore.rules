@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isFamilyMember(familyId) {
+      return isSignedIn() &&
+        request.auth.uid in get(/databases/$(database)/documents/families/$(familyId)).data.memberUids;
+    }
+
+    match /users/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    match /families/{familyId} {
+      // Any signed-in user can read a family doc — needed so someone can look
+      // up a family by invite code before they've joined it. Only existing
+      // members can update (e.g. add themselves) or touch children/intake.
+      // Good enough for a small closed beta; tighten via a Cloud Function
+      // (server-side "redeem invite code") before opening this up publicly.
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isFamilyMember(familyId);
+
+      match /children/{childId} {
+        allow read, write: if isFamilyMember(familyId);
+
+        match /intake/{categoryId} {
+          allow read, write: if isFamilyMember(familyId);
+        }
+      }
+    }
+  }
+}

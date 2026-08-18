@@ -10,9 +10,11 @@ import androidx.navigation.navArgument
 import com.avika.app.data.local.seedSchemes
 import com.avika.app.data.repository.ClinicRepository
 import com.avika.app.data.repository.VenueRepository
+import com.avika.app.session.SessionViewModel
 import com.avika.app.ui.screens.about.AboutScreen
 import com.avika.app.ui.screens.directory.DirectoryDetailScreen
 import com.avika.app.ui.screens.directory.DirectoryListScreen
+import com.avika.app.ui.screens.family.ProfileScreen
 import com.avika.app.ui.screens.home.HomeScreen
 import com.avika.app.ui.screens.schemes.SchemesScreen
 import com.avika.app.ui.screens.venues.VenueDetailScreen
@@ -23,6 +25,7 @@ fun AvikaNavHost(
     navController: NavHostController,
     clinicRepository: ClinicRepository,
     venueRepository: VenueRepository,
+    sessionViewModel: SessionViewModel,
     modifier: Modifier = Modifier,
 ) {
     NavHost(navController = navController, startDestination = Screen.Home.route, modifier = modifier) {
@@ -31,6 +34,13 @@ fun AvikaNavHost(
                 onOpenDirectory = { navController.navigate(Screen.Directory.route) },
                 onOpenVenues = { navController.navigate(Screen.Venues.route) },
                 onOpenSchemes = { navController.navigate(Screen.Schemes.route) },
+                onOpenProfile = { navController.navigate(Screen.Profile.route) },
+            )
+        }
+        composable(Screen.Profile.route) {
+            ProfileScreen(
+                sessionViewModel = sessionViewModel,
+                onExit = { navController.popBackStack() },
             )
         }
         composable(Screen.Directory.route) {
