@@ -4,7 +4,7 @@
     {
       "name": "avika-prototype",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8734", "--directory", "prototype", "--bind", "127.0.0.1"],
+      "runtimeArgs": ["-m", "http.server", "8734", "--directory", "docs", "--bind", "127.0.0.1"],
       "port": 8734
     }
   ]

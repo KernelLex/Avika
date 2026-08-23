@@ -1,0 +1,15 @@
+Avika is a free directory and guide for Bengaluru families raising a child with a disability — built to answer three questions parents ask constantly: which clinic, which places are actually sensory-friendly, and which government schemes are we missing out on.
+
+CLINIC DIRECTORY
+Browse developmental pediatricians, therapy centers, and specialists across Bengaluru. Each listing includes what they specialize in, contact details, and a one-tap call or map button — no sign-up, no forms.
+
+SENSORY-FRIENDLY VENUES
+A curated list of malls, play areas, theatres, and public spaces in Bengaluru that are genuinely welcoming for sensory-sensitive kids, with the details that matter: noise levels, crowding, and quiet spaces.
+
+SCHEMES & UDID GUIDE
+Plain-language explanations of the government schemes, benefits, and the UDID (Unique Disability ID) process families in Karnataka and India are entitled to, with links straight to the official portals.
+
+BUILT FOR PRIVACY
+Avika works entirely offline. There's no account, no sign-in, no ads, and no analytics — every screen reads from a list bundled inside the app, and nothing you do in Avika is ever sent anywhere.
+
+Avika is an independent project, not affiliated with any government body or hospital. Listings are provided as a directory only, not as medical advice or an endorsement.
