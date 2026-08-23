@@ -32,18 +32,21 @@ this environment).
   `title.txt`, `short_description.txt`, `full_description.txt`, and
   `images/icon.png` (512×512) + `images/featureGraphic.png` (1024×500),
   generated from the app's actual launcher-icon glyph so they match the
-  real app icon. `images/phoneScreenshots/` is empty — Play Console
-  requires at least 2 real device screenshots, which need an emulator or
-  phone to capture (see "Still to do" below).
+  real app icon. `images/phoneScreenshots/1.png`–`5.png` are real captures
+  (1080×2400) from a booted emulator running the actual debug build: Home,
+  Clinic Directory list, a clinic detail screen, Sensory-Friendly Venues,
+  and Schemes & UDID Guide.
 
-**✅ Build verified.** A JDK 17 + Android SDK (platforms 36 and 37,
-build-tools 36/37) were installed and `./gradlew assembleDebug` and
-`./gradlew bundleRelease` both ran clean against this exact configuration
-— not just researched, actually compiled. What's still unverified is
-*runtime* behavior: nobody has run the app on a device or emulator since
-this migration, so UI/behavioral regressions (as opposed to compile
-errors) haven't been ruled out. Install `app/build/outputs/apk/debug/
-app-debug.apk` on a device or emulator before you fully trust this.
+**✅ Build and runtime verified.** A JDK 17 + Android SDK (platforms 36
+and 37, build-tools 36/37, plus an emulator) were installed. `./gradlew
+assembleDebug` and `./gradlew bundleRelease` both build clean, and the
+resulting APK was installed and driven on a booted emulator — the
+screenshots above are proof it actually renders and navigates correctly
+post-migration, not just that it compiles. One small pre-existing UI issue
+noticed along the way (not caused by this migration): on the clinic detail
+screen, a therapy-type chip with a long label ("ABA / Autism Therapy")
+wraps one word per line instead of on one line — cosmetic only, worth a
+follow-up fix but not blocking release.
 
 ## Still to do (needs a human + a build environment)
 
@@ -71,12 +74,12 @@ commit them.
 Output: `app/build/outputs/bundle/release/app-release.aab`. This is the
 file you upload to Play Console (not an APK).
 
-### 3. Take real screenshots
+### 3. Phone screenshots — done; tablet is optional
 
-Run the app on an emulator or device (phone, and ideally a 7"/10" tablet)
-and capture at least 2 screenshots per form factor for
-`fastlane/metadata/android/en-US/images/phoneScreenshots/`. Play Console
-requires these before it will let you publish.
+`fastlane/metadata/android/en-US/images/phoneScreenshots/` has 5 real
+screenshots captured from an emulator. If you also want tablet/Chromebook
+store listing assets, those need a tablet-profile emulator or device —
+not done here.
 
 ### 4. Host the privacy policy
 
