@@ -7,15 +7,20 @@ this environment).
 
 ## What's already done in this repo
 
-- `app/build.gradle.kts`: `compileSdk`/`targetSdk` bumped to **36** (Android
-  16), AGP bumped to **9.0.1**, Kotlin to **2.2.10**, and the Compose
-  compiler moved to the `org.jetbrains.kotlin.plugin.compose` Gradle plugin
-  (the old `composeOptions.kotlinCompilerExtensionVersion` DSL doesn't work
-  with Kotlin 2.x). `gradle.properties` opts out of AGP 9's "built-in
-  Kotlin" default (`android.builtInKotlin=false`) so the project keeps using
-  the explicit `org.jetbrains.kotlin.android` plugin instead of migrating to
-  the new plugin-less DSL.
-- Gradle wrapper bumped to **9.1.0** (the minimum AGP 9.0.1 requires).
+- `app/build.gradle.kts`: `compileSdk` bumped to **37**, `targetSdk` to
+  **36** (Android 16 — the actual Play policy requirement; compileSdk is
+  higher only because the current AndroidX/Compose release train requires
+  it to compile at all). AGP bumped to **9.1.1**, Kotlin to **2.2.10** via
+  AGP 9's **built-in Kotlin support** — the classic `org.jetbrains.kotlin.
+  android` plugin was removed entirely (it throws a `ClassCastException`
+  against AGP 9's new extension type; built-in Kotlin is the supported
+  replacement, not just a workaround). The Compose compiler now comes from
+  the separate `org.jetbrains.kotlin.plugin.compose` Gradle plugin (the old
+  `composeOptions.kotlinCompilerExtensionVersion` DSL doesn't work with
+  Kotlin 2.x) and the old `kotlinOptions { jvmTarget = "17" }` block was
+  replaced with `kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }`
+  (the old DSL is a hard error on Kotlin 2.2).
+- Gradle wrapper bumped to **9.3.1** (the minimum AGP 9.1.1 requires).
 - `AndroidManifest.xml`: added `android:enableOnBackInvokedCallback="true"`
   for predictive back, matching the targetSdk 36 baseline.
 - Privacy policy (`docs/privacy-policy.html`) rewritten in an earlier commit
@@ -31,15 +36,14 @@ this environment).
   requires at least 2 real device screenshots, which need an emulator or
   phone to capture (see "Still to do" below).
 
-**⚠️ Important — I could not compile or run this project.** This sandbox
-has no JDK, no Android SDK, and no emulator, so none of the Gradle/Kotlin
-version changes above have been build-verified. AGP 9 / Kotlin 2.2 is a
-real, documented, but non-trivial jump from AGP 8.5 / Kotlin 1.9. **Before
-you rely on this for a release, open the project in a recent Android Studio
-and let it sync** — that's the first real build this configuration will
-see. If sync fails, the two likeliest culprits are the Compose compiler
-plugin wiring in `app/build.gradle.kts` or a library version in
-`gradle/libs.versions.toml` that's since been superseded.
+**✅ Build verified.** A JDK 17 + Android SDK (platforms 36 and 37,
+build-tools 36/37) were installed and `./gradlew assembleDebug` and
+`./gradlew bundleRelease` both ran clean against this exact configuration
+— not just researched, actually compiled. What's still unverified is
+*runtime* behavior: nobody has run the app on a device or emulator since
+this migration, so UI/behavioral regressions (as opposed to compile
+errors) haven't been ruled out. Install `app/build/outputs/apk/debug/
+app-debug.apk` on a device or emulator before you fully trust this.
 
 ## Still to do (needs a human + a build environment)
 
@@ -83,16 +87,13 @@ whoever does to enable **Settings → Pages → Source: Deploy from a branch →
 `https://kernellex.github.io/Avika/privacy-policy.html` — that's the URL
 Play Console's "Privacy policy" field wants.
 
-### 5. Decide on `targetSdk` risk
+### 5. `targetSdk` status
 
 Google requires **new apps to target API 36 by Aug 31, 2026** (an
 extension to Nov 1, 2026 is available in Play Console if you need it). This
-repo now targets 36, but since I couldn't verify the build, if Android
-Studio surfaces problems you can't resolve before the deadline, targeting
-**35** (`app/build.gradle.kts` → `compileSdk`/`targetSdk = 35`, and revert
-AGP to `8.7.0` + Gradle wrapper to `8.9`, no Kotlin/Compose-plugin changes
-needed) is a safe fallback that still satisfies Play's baseline for
-existing apps and buys time.
+repo targets 36 and it's now build-verified (see above) — no further
+action needed here unless Play Console itself flags something at upload
+time.
 
 ## Play Console walkthrough
 
